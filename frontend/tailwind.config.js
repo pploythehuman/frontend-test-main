@@ -72,6 +72,9 @@ module.exports = {
         "neutral-border": "rgb(231, 229, 228)",
         white: "rgb(255, 255, 255)",
         "default-background": "rgb(255, 255, 255)",
+        "text-primary": "#0d0d0d",
+        "text-secondary": "#5d5d5d", 
+        "text-tertiary": "#8f8f8f",
       },
       fontSize: {
         caption: [
