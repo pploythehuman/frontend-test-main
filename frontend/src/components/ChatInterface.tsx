@@ -6,7 +6,9 @@ import {
 
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
+
 import { chatService } from "../services";
+import { formatTime, getCurrentFormatTime } from "../util/dateUtils";
 
 interface Message {
   id: string;
@@ -44,7 +46,7 @@ export default function ChatInterface({
         const formattedMessages: Message[] = history.messages
           .map((msg: any) => ({
             id: msg.id || Date.now().toString(),
-            role: "user", 
+            role: "user",
             content: msg.question,
             timestamp: msg.timestamp,
           }))
@@ -76,7 +78,7 @@ export default function ChatInterface({
       id: Date.now().toString(),
       role: "user",
       content: inputValue.trim(),
-      timestamp: new Date().toISOString(),
+      timestamp: getCurrentFormatTime(),
     };
 
     setMessages((prev) => [...prev, userMessage]);
@@ -108,7 +110,7 @@ export default function ChatInterface({
         role: "assistant",
         content:
           "Sorry, I encountered an error while processing your message. Please try again.",
-        timestamp: new Date().toISOString(),
+        timestamp: getCurrentFormatTime(),
       };
 
       setMessages((prev) => [...prev, errorMessage]);
@@ -169,7 +171,7 @@ export default function ChatInterface({
                         : "text-text-tertiary"
                     }`}
                   >
-                    {new Date(message.timestamp).toLocaleTimeString()}
+                    {formatTime(message.timestamp)}
                   </p>
                 </div>
               </div>
@@ -198,7 +200,7 @@ export default function ChatInterface({
             onKeyDown={handleKeyPress}
             placeholder="How can I help you today?"
             disabled={isLoading}
-            className="flex-1 bg-stone-100 border-neutral-200" 
+            className="flex-1 border-neutral-200 bg-stone-100"
           />
           <Button
             onClick={handleSendMessage}

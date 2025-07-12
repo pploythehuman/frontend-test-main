@@ -71,8 +71,9 @@ class ChatSummary(BaseModel):
 
     chat_id: str
     message_count: int
-    first_question: str = None
-    last_message_time: str = None
+    # TODO: Check this later
+    first_question: Optional[str] = None
+    last_message_time: Optional[str] = None
 
 
 class AllChatsResponse(BaseModel):
