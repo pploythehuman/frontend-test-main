@@ -1,9 +1,8 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Button } from "../components/ui/button";
 import {
   PlusIcon,
   TrashIcon,
-  ArchiveBoxIcon,
   Bars3Icon,
   ChatBubbleLeftIcon,
 } from "@heroicons/react/24/outline";
@@ -39,7 +38,7 @@ export default function AppSideBar({
 
   const handleUploadError = (error: string) => {
     setFileError(error);
-    setFileError(null)
+    setTimeout(() => setFileError(null), 5000);
   };
 
   const mainActions = [
