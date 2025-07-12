@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import ChatInterface from "../components/ChatInterface";
+import ChatInterface from "../feature/chat/ChatInterface";
 import { chatService } from "../services";
 
 function MainLayout() {

@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import { Button } from "../components/ui/button";
 import {
   PlusIcon,
@@ -7,6 +8,9 @@ import {
   ChatBubbleLeftIcon,
 } from "@heroicons/react/24/outline";
 import { ChatSummary } from "../types";
+import FileUpload from "../feature/upload/FileUpload";
+import FilesList from "../feature/upload/FilesList";
+import SessionManager from "../feature/session/SessionManager";
 
 interface AppSideBarProps {
   chats: ChatSummary[];
@@ -15,7 +19,6 @@ interface AppSideBarProps {
   onNewChat: () => void;
   onClearHistory: () => void;
   onChatSelect: (chatId: string) => void;
-  onArtifacts: () => void;
 }
 
 export default function AppSideBar({
@@ -25,8 +28,20 @@ export default function AppSideBar({
   onNewChat,
   onClearHistory,
   onChatSelect,
-  onArtifacts,
 }: AppSideBarProps) {
+  const [fileError, setFileError] = useState<string | null>(null);
+  const [filesRefreshTrigger, setFilesRefreshTrigger] = useState(0);
+
+  const handleUploadComplete = () => {
+    setFilesRefreshTrigger((prev) => prev + 1);
+    setFileError(null);
+  };
+
+  const handleUploadError = (error: string) => {
+    setFileError(error);
+    setFileError(null)
+  };
+
   const mainActions = [
     {
       icon: PlusIcon,
@@ -37,11 +52,6 @@ export default function AppSideBar({
       icon: TrashIcon,
       label: "Clear Chat History",
       onClick: onClearHistory,
-    },
-    {
-      icon: ArchiveBoxIcon,
-      label: "Artifacts",
-      onClick: onArtifacts,
     },
   ];
 
@@ -70,7 +80,7 @@ export default function AppSideBar({
         </Button>
       </div>
 
-      <div className="flex flex-col gap-2 border-b border-neutral-200 p-3">
+      <div className="flex flex-col border-b border-neutral-200 p-3">
         {mainActions.map((action, index) => (
           <Button
             key={index}
@@ -82,6 +92,23 @@ export default function AppSideBar({
             <span className="text-sm">{action.label}</span>
           </Button>
         ))}
+
+        <div className="mt-2 border-t border-neutral-200 pt-2">
+          <FileUpload
+            onUploadComplete={handleUploadComplete}
+            onUploadError={handleUploadError}
+          />
+          <FilesList
+            onError={handleUploadError}
+            refreshTrigger={filesRefreshTrigger}
+          />
+        </div>
+
+        {fileError && (
+          <div className="mt-2 rounded border border-red-200 bg-red-50 p-2 text-xs text-red-600">
+            {fileError}
+          </div>
+        )}
       </div>
 
       <div className="flex-1 overflow-y-auto">
@@ -127,6 +154,8 @@ export default function AppSideBar({
           )}
         </div>
       </div>
+
+      <SessionManager />
     </div>
   );
 }

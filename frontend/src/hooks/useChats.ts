@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { ChatSummary, AllChatsResponse } from "../types";
 import { chatService } from "../services";
+import { useSessionStore } from "../store/sessionStore";
 
 interface UseChatState {
   chats: ChatSummary[];
@@ -13,7 +14,6 @@ interface UseChatState {
 interface UseChatActions {
   refreshChats: () => Promise<void>;
   createNewChat: () => Promise<string | null>;
-  resetChat: (chatId?: string) => Promise<void>;
 }
 
 type UseChatsReturn = UseChatState & UseChatActions;
@@ -26,6 +26,8 @@ export const useChats = (): UseChatsReturn => {
     totalSessions: 0,
     totalMessages: 0,
   });
+
+  const { fetchStatus } = useSessionStore();
 
   const fetchChats = useCallback(async () => {
     try {
@@ -40,6 +42,8 @@ export const useChats = (): UseChatsReturn => {
         totalMessages: data.total_messages,
         loading: false,
       }));
+
+      fetchStatus();
     } catch (err) {
       console.error("Failed to fetch chat history:", err);
       setState(prev => ({
@@ -48,7 +52,7 @@ export const useChats = (): UseChatsReturn => {
         loading: false,
       }));
     }
-  }, []);
+  }, [fetchStatus]);
 
   const refreshChats = useCallback(async () => {
     await fetchChats();
@@ -57,7 +61,8 @@ export const useChats = (): UseChatsReturn => {
   const createNewChat = useCallback(async (): Promise<string | null> => {
     try {
       const response = await chatService.createChat();
-      await refreshChats(); // Refresh the list after creating
+      await refreshChats();
+      fetchStatus();
       return response.chat_id;
     } catch (err) {
       console.error("Failed to create new chat:", err);
@@ -67,20 +72,7 @@ export const useChats = (): UseChatsReturn => {
       }));
       return null;
     }
-  }, [refreshChats]);
-
-  const resetChat = useCallback(async (chatId?: string): Promise<void> => {
-    try {
-      await chatService.resetChat(chatId);
-      await refreshChats(); // Refresh the list after reset
-    } catch (err) {
-      console.error("Failed to reset chat:", err);
-      setState(prev => ({
-        ...prev,
-        error: "Failed to reset chat",
-      }));
-    }
-  }, [refreshChats]);
+  }, [refreshChats, fetchStatus]);
 
   useEffect(() => {
     fetchChats();
@@ -90,6 +82,5 @@ export const useChats = (): UseChatsReturn => {
     ...state,
     refreshChats,
     createNewChat,
-    resetChat,
   };
 }; 

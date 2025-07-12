@@ -4,11 +4,11 @@ import {
   PaperAirplaneIcon,
 } from "@heroicons/react/24/outline";
 
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
+import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
 
-import { chatService } from "../services";
-import { formatTime, getCurrentFormatTime } from "../util/dateUtils";
+import { chatService } from "../../services";
+import { formatTime, getCurrentFormatTime } from "../../util/dateUtils";
 
 interface Message {
   id: string;

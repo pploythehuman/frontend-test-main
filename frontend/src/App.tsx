@@ -7,10 +7,11 @@ import {
 import AppSideBar from "./layout/AppSideBar";
 import MainLayout from "./layout/MainLayout";
 import { useChats } from "./hooks";
+import { chatService } from "./services";
 
 function AppContent() {
   const navigate = useNavigate();
-  const { chats, loading, error, createNewChat, resetChat } = useChats();
+  const { chats, loading, error, createNewChat, refreshChats } = useChats();
 
   const handleNewChat = async () => {
     const newChatId = await createNewChat();
@@ -20,16 +21,13 @@ function AppContent() {
   };
 
   const handleClearHistory = async () => {
-    await resetChat();
+    await chatService.resetChat();
+    await refreshChats();
     navigate("/");
   };
 
   const handleChatSelect = (chatId: string) => {
     navigate(`/chat/${chatId}`);
-  };
-
-  const handleArtifacts = () => {
-    // TODO: Navigate to artifacts
   };
 
   return (
@@ -41,7 +39,6 @@ function AppContent() {
         onNewChat={handleNewChat}
         onClearHistory={handleClearHistory}
         onChatSelect={handleChatSelect}
-        onArtifacts={handleArtifacts}
       />
       <Routes>
         <Route path="/" element={<MainLayout />} />
