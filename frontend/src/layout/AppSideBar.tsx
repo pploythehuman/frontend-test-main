@@ -1,46 +1,131 @@
 import { Button } from "../components/ui/button";
+import {
+  PlusIcon,
+  TrashIcon,
+  ArchiveBoxIcon,
+  Bars3Icon,
+  ChatBubbleLeftIcon,
+} from "@heroicons/react/24/outline";
+import { ChatSummary } from "../types";
 
-export default function AppSideBar() {
+interface AppSideBarProps {
+  chats: ChatSummary[];
+  loading: boolean;
+  error: string | null;
+  onNewChat: () => void;
+  onClearHistory: () => void;
+  onChatSelect: (chatId: string) => void;
+  onArtifacts: () => void;
+}
+
+export default function AppSideBar({
+  chats,
+  loading,
+  error,
+  onNewChat,
+  onClearHistory,
+  onChatSelect,
+  onArtifacts,
+}: AppSideBarProps) {
+  const mainActions = [
+    {
+      icon: PlusIcon,
+      label: "New Chat",
+      onClick: onNewChat,
+    },
+    {
+      icon: TrashIcon,
+      label: "Clear Chat History",
+      onClick: onClearHistory,
+    },
+    {
+      icon: ArchiveBoxIcon,
+      label: "Artifacts",
+      onClick: onArtifacts,
+    },
+  ];
+
+  const formatChatTitle = (chat: ChatSummary): string => {
+    if (chat.first_question) {
+      return chat.first_question.length > 30
+        ? chat.first_question.substring(0, 30) + "..."
+        : chat.first_question;
+    }
+    return `Chat ${chat.chat_id.substring(0, 8)}...`;
+  };
+
   return (
-    <div className="flex w-[250px] flex-col bg-inherit p-2">
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <Button className="flex items-center">
-            <img
-              src="/logo.png"
-              alt="Logo"
-              className="border-brand-500 border-1 h-8 w-auto rounded-full"
-            />
-          </Button>
-          <Button className="rounded-md p-2 hover:bg-neutral-200">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.5"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              className="text-text-tertiary h-5 w-5"
-            >
-              <rect width="18" height="18" x="3" y="3" rx="2" />
-              <path d="M9 3v18" />
-            </svg>
-          </Button>
+    <div className="flex h-full w-[250px] flex-col bg-neutral-100">
+      <div className="flex items-center justify-between border-b border-neutral-200 p-3">
+        <div className="flex items-center gap-2">
+          <img src="/logo.png" alt="Logo" className="h-6 w-6 rounded-full" />
+          <span className="text-text-primary text-sm font-medium">ChatApp</span>
         </div>
-
-        <Button className="w-full">New Chat</Button>
-        <Button className="w-full">Clear Chat History</Button>
-        <Button className="w-full">Library</Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="text-text-tertiary hover:text-text-primary h-8 w-8 p-0 hover:bg-neutral-200"
+        >
+          <Bars3Icon className="h-4 w-4" />
+        </Button>
       </div>
-      <div className="space-y-2">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <Button key={i} className="w-full">
-            first_question
+
+      <div className="flex flex-col gap-2 border-b border-neutral-200 p-3">
+        {mainActions.map((action, index) => (
+          <Button
+            key={index}
+            variant="ghost"
+            onClick={action.onClick}
+            className="text-text-secondary hover:text-text-primary h-10 w-full justify-start gap-3 rounded-md px-3 hover:bg-neutral-200"
+          >
+            <action.icon className="h-4 w-4 flex-shrink-0" />
+            <span className="text-sm">{action.label}</span>
           </Button>
         ))}
+      </div>
+
+      <div className="flex-1 overflow-y-auto">
+        <div className="p-3">
+          <h3 className="text-text-tertiary mb-3 text-xs font-medium uppercase tracking-wider">
+            Recent Chats
+          </h3>
+
+          {loading && (
+            <div className="text-text-tertiary text-sm">Loading chats...</div>
+          )}
+
+          {error && <div className="text-sm text-red-500">{error}</div>}
+
+          {!loading && !error && chats.length === 0 && (
+            <div className="text-text-tertiary text-sm">No recent chats</div>
+          )}
+
+          {!loading && !error && chats.length > 0 && (
+            <div className="space-y-1">
+              {chats.map((chat) => (
+                <Button
+                  key={chat.chat_id}
+                  variant="ghost"
+                  onClick={() => onChatSelect(chat.chat_id)}
+                  className="text-text-secondary hover:text-text-primary h-10 w-full justify-start rounded-md px-3 text-left hover:bg-neutral-200"
+                >
+                  <div className="flex w-full items-center gap-3">
+                    <ChatBubbleLeftIcon className="text-text-tertiary h-4 w-4 flex-shrink-0" />
+                    <div className="min-w-0 flex-1">
+                      <span className="block truncate text-sm">
+                        {formatChatTitle(chat)}
+                      </span>
+                      <span className="text-text-tertiary text-xs">
+                        {chat.message_count} message
+                        {chat.message_count !== 1 ? "s" : ""}
+                      </span>
+                    </div>
+                  </div>
+                </Button>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
