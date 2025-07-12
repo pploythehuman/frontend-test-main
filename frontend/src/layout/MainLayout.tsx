@@ -6,9 +6,7 @@ function MainLayout() {
   const { chatId } = useParams<{ chatId: string }>();
   const navigate = useNavigate();
 
-  const handleSendMessage = async (message: string) => {
-    console.log("Sending message:", message, "Chat ID:", chatId);
-    
+  const handleSendMessage = async () => {
     if (!chatId) {
       try {
         const response = await chatService.createChat();
@@ -21,10 +19,7 @@ function MainLayout() {
 
   return (
     <div className="w-full rounded-3xl bg-white shadow-md">
-      <ChatInterface 
-        chatId={chatId} 
-        onSendMessage={handleSendMessage} 
-      />
+      <ChatInterface chatId={chatId} onSendMessage={handleSendMessage} />
     </div>
   );
 }

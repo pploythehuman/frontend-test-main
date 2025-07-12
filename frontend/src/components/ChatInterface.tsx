@@ -198,7 +198,7 @@ export default function ChatInterface({
             onKeyDown={handleKeyPress}
             placeholder="How can I help you today?"
             disabled={isLoading}
-            className="flex-1"
+            className="flex-1 bg-stone-100 border-neutral-200" 
           />
           <Button
             onClick={handleSendMessage}
