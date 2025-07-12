@@ -1,16 +1,17 @@
-import { useState } from "react";
+import React from "react";
+import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
 import AppSideBar from "./layout/AppSideBar";
 import MainLayout from "./layout/MainLayout";
 import { useChats } from "./hooks";
 
-function App() {
+function AppContent() {
+  const navigate = useNavigate();
   const { 
     chats, 
     loading, 
     error, 
     createNewChat, 
     resetChat,
-    refreshChats 
   } = useChats();
 
   const handleNewChat = async () => {
@@ -18,7 +19,7 @@ function App() {
     const newChatId = await createNewChat();
     if (newChatId) {
       console.log("New chat created:", newChatId);
-      // TODO: Create a new chat + navigate
+      navigate("/");
     }
   };
 
@@ -29,7 +30,7 @@ function App() {
 
   const handleChatSelect = (chatId: string) => {
     console.log("Selected chat:", chatId);
-    // TODO: Navigate to chat
+    navigate(`/chat/${chatId}`);
   };
 
   const handleArtifacts = () => {
@@ -48,8 +49,19 @@ function App() {
         onChatSelect={handleChatSelect}
         onArtifacts={handleArtifacts}
       />
-      <MainLayout />
+      <Routes>
+        <Route path="/" element={<MainLayout />} />
+        <Route path="/chat/:chatId" element={<MainLayout />} />
+      </Routes>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <AppContent />
+    </Router>
   );
 }
 

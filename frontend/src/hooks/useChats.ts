@@ -82,7 +82,6 @@ export const useChats = (): UseChatsReturn => {
     }
   }, [refreshChats]);
 
-  // Initial fetch
   useEffect(() => {
     fetchChats();
   }, [fetchChats]);

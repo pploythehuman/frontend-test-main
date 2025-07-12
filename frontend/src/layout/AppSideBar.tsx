@@ -101,7 +101,7 @@ export default function AppSideBar({
           )}
 
           {!loading && !error && chats.length > 0 && (
-            <div className="space-y-1">
+            <div className="space-y-4">
               {chats.map((chat) => (
                 <Button
                   key={chat.chat_id}
