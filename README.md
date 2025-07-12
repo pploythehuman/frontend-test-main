@@ -1,160 +1,131 @@
 # ArcFusion Take-Home Assignment: Frontend
 
-## Objective
+## How to Run Locally
 
-Build a production-ready frontend application that enables users to upload PDFs and ask questions about their content via an API. The focus is on component architecture, state management, styling, and frontend code quality — not on the LLM or AI logic itself. The chat response from the backend will be mocked. You are expected to only do frontend development.
+### Quick Start with Docker Compose
 
-## Requirements
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd frontend-test-main
+   ```
 
-Frontend Stack
+2. **Start the application**
+   ```bash
+   docker-compose up --build
+   ```
 
-- React (with TypeScript)
-- Tailwind CSS (Shadcn, Radix UI, or custom components)
-- State Management: Your choice (Zustand, Redux, React Context)
-- Component Design: Reusable, documented, scalable
+3. **Access the application**
+   - Frontend: http://localhost:3000
+   - Backend API: http://localhost:8000
+   - API Documentation: http://localhost:8000/docs
 
-## Core Features
+### Manual Setup (Development)
 
-- PDF Upload UI
-- Allow users to upload one or more PDF files
-- Display uploaded filenames in a list
-- Chat-like Q&A Interface
-- Input field for user to ask questions
-- Display of question/answer pairs
-- Simulate real-time feedback (loading indicators)
-- Session Management
-- "Reset" button to clear current chat session
-- Memory Indicator
-- Show whether the current session has memory (e.g., simple badge or toggle)
-
-## Bonus Points
-
-- Component-driven development (with Storybook)
-- Theme toggle (dark/light mode)
-- Responsive design across mobile/tablet/desktop
-- Accessibility (WAI-ARIA)
-- Visual regression testing setup (Chromatic or similar)
-- Websocket integration for chat api
-
-## Deliverables
-
-Git Repository
-
-- Source code
-- Component folder structure clearly organized
-- Docker + docker-compose setup for easy run
-
-README.md containing:
-
-- How to run it locally using `docker-compose.yml`
-- Project structure and component breakdown
-- Any tradeoffs or assumptions made
-- What you would do to improve in a real-world scenario
-  Optional: Short Loom/video walkthrough explaining the project
-
-## What We're Evaluating
-
-Category What We Look For
-
-- Architecture Well-structured, maintainable codebase
-- Component Design Reusability, isolation, and clarity
-- State Management Clean, scalable handling of UI and app state
-- API Integration Clean, decoupled service layer or hooks
-- Styling & Theming Tailwind conventions, consistent visual system
-- Code Quality TypeScript use, folder structure, code readability
-- UX Attention Thoughtful interactions, loading/error handling
-- Ownership Mindset README clarity, polish, and documentation
-
-## Backend Setup (For Candidates)
-
-A FastAPI backend has been provided for this take-home test. Follow these steps to set it up:
-
-### Using Docker
-
+#### Backend Setup
 ```bash
-docker compose -f docker-compose.yml up --build
+# Install Python dependencies
+pip install -r requirements.txt
 
-# The API will be available at http://localhost:8000
-# API Documentation: http://localhost:8000/docs
+# Run FastAPI server
+cd app && python main.py
 ```
 
-### Available Endpoints
+#### Frontend Setup
+```bash
+# Install Node.js dependencies
+cd frontend && npm install
 
-#### Core Functionality
-
-- **POST** `/api/upload` - Upload PDF files
-- **POST** `/api/chat` - Ask questions about uploaded documents
-- **POST** `/api/reset` - Reset chat session and clear memory
-- **WebSocket** `/api/ws/chat` - Streaming chat interface
-
-#### Chat Management
-
-- **POST** `/api/chat/create` - Create new chat session
-- **GET** `/api/chat/{chat_id}` - Get chat history for specific chat ID
-- **GET** `/api/chat` - Get summary of all chat sessions
-
-#### Dashboard & Info
-
-- **GET** `/api/files` - Get all uploaded files information
-- **GET** `/api/status` - Get session status
-- **GET** `/health` - Health check
-
-### API Documentation
-
-Once the backend is running, visit:
-
-- Interactive API docs: http://localhost:8000/docs
-- Alternative docs: http://localhost:8000/redoc
-
-### Frontend Integration
-
-The backend is configured to work with frontend applications.
-Visit the docs for more detailed response schemas.
-
-```javascript
-// Upload files
-const formData = new FormData();
-formData.append("files", pdfFile);
-const response = await fetch("http://localhost:8000/api/upload", {
-  method: "POST",
-  body: formData,
-});
-
-// Chat
-const response = await fetch("http://localhost:8000/api/chat", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ question: "What is this document about?" }),
-});
-
-// WebSocket streaming
-const ws = new WebSocket("ws://localhost:8000/api/ws/chat");
-ws.send(
-  JSON.stringify({
-    question: "Your question here",
-    chat_id: "optional-chat-id",
-  })
-);
-
-// Create new chat session
-const newChat = await fetch("http://localhost:8000/api/chat/create", {
-  method: "POST",
-});
-const { chat_id } = await newChat.json();
-
-// Get chat history
-const chatHistory = await fetch(`http://localhost:8000/chat/${chat_id}`);
-const history = await chatHistory.json();
-
-// Get all chats summary
-const allChats = await fetch("http://localhost:8000/api/chat");
-const chatsData = await allChats.json();
-
-// Get uploaded files info
-const files = await fetch("http://localhost:8000/api/files");
-const filesData = await files.json();
+# Start React development server
+npm start
 ```
 
-## Questions?
+## Project Structure and Component Breakdown
 
-Please feel free to reach out any time if you need clarification or run into blockers.
+### Frontend Architecture (`/frontend/src/`)
+
+```
+src/
+├── components/           # Reusable UI components
+│   └── ui/              # Base UI components (Button, Input)
+├── feature/             # Feature-based modules
+│   ├── chat/            # Chat functionality
+│   │   └── ChatInterface.tsx
+│   ├── upload/          # File upload functionality
+│   │   ├── FileUpload.tsx
+│   │   └── FilesList.tsx
+│   └── session/         # Session management
+│       └── SessionManager.tsx
+├── layout/              # Layout components
+│   ├── AppSideBar.tsx
+│   └── MainLayout.tsx
+├── hooks/               # Custom React hooks
+│   └── useChats.ts
+├── services/            # API service layer
+│   └── chatService.ts
+├── store/               # State management
+│   └── sessionStore.ts  # Zustand store
+├── types/               # TypeScript type definitions
+│   └── api.ts
+├── util/                # Utility functions
+│   └── dateUtils.ts
+└── lib/                 # External library configurations
+    └── utils.ts
+```
+
+### Key Components
+
+#### 1. **ChatInterface** (`/feature/chat/`)
+- Handles message display and user input
+- Manages chat history loading
+- Real-time message sending with loading states
+- Thai timezone formatting for timestamps
+
+#### 2. **FileUpload** (`/feature/upload/`)
+- Drag & drop PDF upload functionality
+- File validation (PDF only)
+- Progress tracking and error handling
+- Modal-based UI with file preview
+
+#### 3. **FilesList** (`/feature/upload/`)
+- Displays uploaded files with metadata
+- File size formatting
+- Upload timestamp display
+- Modal interface for file management
+
+#### 4. **SessionManager** (`/feature/session/`)
+- Memory state tracking
+
+## Tradeoffs and Assumptions Made
+
+### 1. **State Management Choice**
+- **Chosen**: Zustand over Redux/Context API
+- **Reasoning**: Simpler boilerplate, better TypeScript support, sufficient for app complexity
+- **Tradeoff**: Less ecosystem tooling compared to Redux
+
+### 2. **Component Architecture**
+- **Chosen**: Feature-based folder structure
+- **Reasoning**: Better scalability, clear separation of concerns
+- **Tradeoff**: Slightly more complex navigation for smaller projects
+
+## What Would Be Improved in a Real-World Scenario
+
+### 1. **State Management & Caching**
+- Implement React Query or SWR for better data fetching
+- Add optimistic updates for better UX
+- Implement proper cache invalidation strategies
+
+### 2. **Testing Strategy**
+- Unit tests for all components (Jest + React Testing Library)
+- Integration tests for user flows
+- E2E tests with Cypress or Playwright
+- Visual regression tests with Chromatic
+
+## Technology Stack
+
+- **Frontend**: React 18, TypeScript, Tailwind CSS
+- **State Management**: Zustand
+- **API Client**: Fetch API
+- **Backend**: FastAPI, Python
+- **Containerization**: Docker, Docker Compose
+- **UI Components**: Custom components with Radix UI primitives
